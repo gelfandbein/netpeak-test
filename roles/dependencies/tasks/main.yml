@@ -1,0 +1,62 @@
+---
+  # Install python
+  - name: "Install python on machine"
+    raw: apt -yqq update && apt install -yqq python-minimal
+
+  # Update repository and ugprade OS to latest
+  - name: Update and Upgrade
+    apt:
+      upgrade: dist
+      update_cache: yes
+
+  # Install some utilities that all servers benefit from and most of our scripts require
+  - name: Install dependencies
+    apt: name={{ item }} state=latest update_cache=yes
+    with_items:
+    - unzip
+    - imagemagick
+    - ssmtp
+    - libtool-bin
+    - libzip-dev
+    - lbzip2
+    - libxml2-dev
+    - bzip2
+    - pkg-config
+    - libgd-dev
+    - libxslt1-dev
+    - ufw
+    - htop
+    - wget
+    - python-mysqldb
+    - libmysqlclient-dev
+    - curl
+    sudo: yes
+
+  # Install firewall and initial setup
+  - name: Initial Setup of firewall (tcp)
+    ufw:
+      rule: allow
+      proto: tcp
+      to_port: "{{ item }}"
+    with_items:
+      - ftp
+      - ssh
+      - http
+      - https
+      - ssmtp
+      - smtp
+      - pop3
+      - pop3s
+      - imap
+      - imaps
+      - domain
+
+  - name: Initial setup of firewall (udp)
+    ufw:
+      rule: allow
+      to_port: '{{ item }}'
+      proto: udp
+    with_items:
+      - domain
+      - https
+      - ssh

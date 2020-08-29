@@ -1,0 +1,27 @@
+---
+
+- hosts: all
+  roles:
+  -
+    role: common
+    tags: [init]
+
+- hosts: all
+  user: root
+  roles:
+  -
+    role: rsyslog
+    tags: [init]
+  -
+    role: redis
+    tags: [init]
+  -
+    role: nginx
+    tags: [www]
+  -
+    role: php
+    tags: [www]
+
+  -
+    role: mariadb
+    tags: [db]

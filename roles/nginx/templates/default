@@ -1,0 +1,25 @@
+server {
+        listen {{ http_port }};
+        listen [::]:{{ http_port }};
+
+        root /var/www/html;
+        index index.php index.html index.htm index.nginx-debian.html;
+
+        client_max_body_size 256M;
+
+        server_name {{ host_name }};
+
+        location / {
+                try_files $uri $uri/ /index.php$is_args$args;
+        }
+
+        location ~ \.php$ {
+               include snippets/fastcgi-php.conf;
+               fastcgi_pass unix:/run/php/php{{ php }}-fpm.sock;
+               fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+
+        location ~ /\.ht {
+               deny all;
+        }
+}

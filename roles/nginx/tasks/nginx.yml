@@ -1,0 +1,20 @@
+---
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: latest
+  with_items:
+   - nginx
+   - python-passlib
+
+- name: Use MY nginx configuration
+  template:
+    src: default
+    dest: /etc/nginx/sites-available/default
+
+- name: Restart Nginx
+  service:
+    name: nginx
+    state: restarted
+    enabled: yes
+

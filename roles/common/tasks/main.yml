@@ -1,0 +1,32 @@
+---
+# This role contains common plays that will run on all nodes.
+
+
+- name: Update apt
+  apt:
+    update_cache: yes
+    cache_valid_time: 86400
+
+- name: Install required python packages
+  apt:
+    name:
+      ["python3-pip", "python3-apt"]
+    state: present
+
+- name: Install ntp
+  yum: name=ntp state=present
+  tags: ntp
+
+- name: Configure ntp file
+  template: src=ntp.conf.j2 dest=/etc/ntp.conf
+  tags: ntp
+  notify: restart ntp
+
+- name: Start the ntp service
+  service: name=ntp state=started enabled=true
+  tags: ntp
+
+#- name: insert iptables template
+#  template: src=iptables.j2 dest=/etc/sysconfig/iptables
+#  notify: restart iptables
+

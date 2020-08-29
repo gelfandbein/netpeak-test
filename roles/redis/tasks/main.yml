@@ -1,0 +1,8 @@
+---
+- name: Install Redis
+  apt: name={{ item }} state=latest
+  with_items:
+   - redis
+
+- name: Start redis Service
+  service: name=redis-server state=started enabled=true
