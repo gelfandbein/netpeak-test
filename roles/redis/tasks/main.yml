@@ -1,8 +1,17 @@
 ---
 - name: Install Redis
-  apt: name={{ item }} state=latest
+  apt:
+    pkg: redis-server
+    state: latest
+#  sudo: true
   with_items:
    - redis
+  tags: [redis]
 
 - name: Start redis Service
   service: name=redis-server state=started enabled=true
+#  sudo: true
+  tags: [redis]
+
+- include: redisadmin.yml
+

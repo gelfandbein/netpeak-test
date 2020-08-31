@@ -1,0 +1,32 @@
+---
+- name: Add pma-repo to apt-sources
+  copy:
+    src: ../files/phpmyadmin.list
+    dest: /etc/apt/sources.list.d/phpmyadmin.list
+
+- name: Update APT sources (added phpMyAdmin)
+  apt:
+    update_cache: yes
+
+- name: PhpMyAdmin is installed with dependencies
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - php7.3-bz2
+    - php7.3-curl
+    - php7.3-gd
+    - php7.3-mbstring
+    - php7.3-mysql
+    - php7.3-xml
+    - php7.3-zip
+    - phpmyadmin
+
+- name: ensure phpmyadmin package is installed
+  apt:
+    name: phpmyadmin
+
+- include: nginx.yml
+- include: config.yml
+

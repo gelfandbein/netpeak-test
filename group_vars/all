@@ -1,10 +1,13 @@
 ---
 host_name: localhost
-http_port: 8181
-# ntp server
+http_port: 80
 ntpserver: 0.ua.pool.ntp.org
 php: 7.3
 mysql_root_password: 123123123
 
+phpmyadmin_mysql_user: root
+phpmyadmin_mysql_password: 123123123
 
+__phpmyadmin_config_file: /etc/phpmyadmin/config.inc.php
 
+locale: en_US.UTF-8

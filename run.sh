@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# 1st step
+# build the container for tests
 # docker build . --tag netpeak:latest
 
-# 2nd step
-# docker run -d netpeak:latest -p 8181:80
+# run container
+# docker run -d -p 8181:80 --privileged netpeak:latest
 
-# 3rd step
+# step for Vagrant
 # ansible-playbook -i hosts setup.yml
 
-# 4th step
+# play step
 ansible-playbook playbook.yml

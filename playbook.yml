@@ -14,14 +14,17 @@
     tags: [init]
   -
     role: redis
-    tags: [init]
+    tags: [init, redis]
   -
     role: nginx
     tags: [www]
   -
     role: php
     tags: [www]
-
+  -
+    role: phpmyadmin
+    tags: [www]
   -
     role: mariadb
-    tags: [db]
+    tags: [mysql, mariadb]
+

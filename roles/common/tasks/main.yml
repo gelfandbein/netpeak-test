@@ -1,32 +1,16 @@
 ---
-# This role contains common plays that will run on all nodes.
+- name: Correct TZ
+  file:
+    src: /usr/share/zoneinfo/Europe/Kiev
+    dest: /etc/localtime
+    state: hard
 
+- name: Correct LC
+  shell: echo "Europe/Kiev" > /etc/timezone
 
-- name: Update apt
-  apt:
-    update_cache: yes
-    cache_valid_time: 86400
+- include: debian.yml
+  when: ansible_os_family == 'Debian'
 
-- name: Install required python packages
-  apt:
-    name:
-      ["python3-pip", "python3-apt"]
-    state: present
-
-- name: Install ntp
-  yum: name=ntp state=present
-  tags: ntp
-
-- name: Configure ntp file
-  template: src=ntp.conf.j2 dest=/etc/ntp.conf
-  tags: ntp
-  notify: restart ntp
-
-- name: Start the ntp service
-  service: name=ntp state=started enabled=true
-  tags: ntp
-
-#- name: insert iptables template
-#  template: src=iptables.j2 dest=/etc/sysconfig/iptables
-#  notify: restart iptables
+- include: redhat.yml
+  when: ansible_os_family == 'RedHat'
 

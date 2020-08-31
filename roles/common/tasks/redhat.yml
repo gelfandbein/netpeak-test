@@ -1,0 +1,7 @@
+- name: install requirements
+  yum: name={{item}} state=latest update_cache=true
+  with_items:
+      - gcc
+      - python-dev
+      - python-setuptools
+      - python-software-properties

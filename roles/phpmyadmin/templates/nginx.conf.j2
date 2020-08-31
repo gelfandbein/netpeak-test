@@ -1,0 +1,20 @@
+# Added by Ansible for phpMyAdmin
+
+location /phpmyadmin {
+  alias /usr/share/phpmyadmin/;
+  location ~ \.php$ {
+    fastcgi_pass unix:/run/php/php{{ php }}-fpm.sock;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $request_filename;
+    fastcgi_ignore_client_abort off;
+
+    include fastcgi_params;
+  }
+
+  location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+    access_log    off;
+    log_not_found    off;
+    expires 1M;
+  }
+}
+

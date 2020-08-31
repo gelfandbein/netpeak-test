@@ -1,0 +1,19 @@
+
+- git:
+    repo: 'https://github.com/ErikDubbelboer/phpRedisAdmin.git'
+    dest: /etc/redis/admin
+    clone: yes
+    update: yes
+
+- git:
+    repo: 'https://github.com/nrk/predis.git'
+    dest: /etc/redis/admin/vendor
+    clone: yes
+    update: yes
+
+- name: Link to Web
+  file:
+    src: /etc/redis/admin
+    dest: /var/www/html/redisadmin
+    state: link
+
