@@ -4,27 +4,30 @@
   roles:
   -
     role: common
-    tags: [init]
+    tags: [init, common]
 
 - hosts: all
   user: root
   roles:
   -
     role: rsyslog
-    tags: [init]
+    tags: [init, rsyslog]
+  -
+    role: nginx
+    tags: [www, nginx]
+  -
+    role: php
+    tags: [www, php]
+  -
+    role: phpmyadmin
+    tags: [www, phpmyadmin]
   -
     role: redis
     tags: [init, redis]
   -
-    role: nginx
-    tags: [www]
-  -
-    role: php
-    tags: [www]
-  -
-    role: phpmyadmin
-    tags: [www]
-  -
     role: mariadb
     tags: [mysql, mariadb]
+  -
+    role: finish
+    tags: [end, finish]
 

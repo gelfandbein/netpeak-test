@@ -1,0 +1,25 @@
+---
+#- debug:
+#    var:  "{{common_updates.stdout_lines|last}}"
+
+- name: Gather Package facts
+  package_facts:
+    manager: auto
+
+#- debug:
+#    var: "{{ item }} is installed"
+#  when: "{{ item }} in ansible_facts.packages"
+#  with_items:
+#    - mariadb-server
+#    - nginx
+#    - php
+
+- name: Remove useless packages from the cache
+  apt:
+    autoclean: yes
+
+- name: Remove dependencies that are no longer required
+  apt:
+    autoremove: yes
+  ignore_errors: yes
+

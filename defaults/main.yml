@@ -12,3 +12,11 @@ phpmyadmin_mysql_connect_type: tcp
 phpmyadmin_mysql_user: root
 phpmyadmin_mysql_password: "{{ mysql_root_password }}"
 
+nginx_config_modules:
+  njs: false
+  perl: false
+  waf: false
+  geoip: false
+  image_filter: false
+  rtmp: false
+  xslt: false

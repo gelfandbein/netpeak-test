@@ -1,12 +1,11 @@
-- name: Install php{{ php }}, php{{ php }}-fpm, php{{ php }}-redis
+- name: Install php{{ php_version }} with php{{ php_version }}-fpm & php{{ php_version }}-redis
   apt:
-    name: ["php{{ php }}", "php{{ php }}-fpm", "php{{ php }}-redis"]
+    name: ["php{{ php_version }}", "php{{ php_version }}-fpm", "php{{ php_version }}-redis"]
     state: present
-    update_cache: yes
   notify: restart php
 
-- name: Restart php{{ php }}-fpm
-  service:
-    name: 'php{{ php }}-fpm'
-    state: restarted
-    enabled: yes
+#- name: Restart php{{ php_version }}-fpm
+#  service:
+#    name: 'php{{ php_version }}-fpm'
+#    state: restarted
+#    enabled: yes

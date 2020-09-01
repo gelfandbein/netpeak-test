@@ -1,17 +1,18 @@
 ---
-- name: Update repository and ugprade OS to latest
+- name: Update repository and ugprade OS to latest (Debian)
   apt:
+    # name: "*"
     upgrade: dist
     update_cache: yes
-    cache_valid_time: 86400
-  tags: common
+    cache_valid_time: 3600
+    state: latest
+  register: common_updates
 
 - name: Install required python packages
   apt:
     name:
       ["python3-pip", "python3-apt"]
     state: present
-  tags: common
 
 - name: Install some utilities that all servers benefit from and most of our scripts require
   apt:
@@ -28,8 +29,9 @@
     - wget
     - curl
     - locales
+    - apt
+    - git
   # sudo: yes
-  tags: common
 
   # Install firewall and initial setup
 - name: Initial Setup of firewall (tcp)
@@ -49,7 +51,6 @@
     #- imap
     #- imaps
     #- domain
-  tags: common
 
 - name: Initial setup of firewall (udp)
   ufw:
@@ -58,11 +59,9 @@
     to_port: "{{ item }}"
   with_items:
     - domain
-  tags: common
 
 - name: Create locale en_US.UTF-8
   template:
     src: locale
     dest: /etc/default/locale
-  tags: common
 

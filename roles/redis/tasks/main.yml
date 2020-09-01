@@ -1,17 +1,12 @@
 ---
-- name: Install Redis
-  apt:
-    pkg: redis-server
-    state: latest
-#  sudo: true
-  with_items:
-   - redis
-  tags: [redis]
+- include: debian.yml
+  when: ansible_os_family == 'Debian'
+  tags: redis
 
-- name: Start redis Service
-  service: name=redis-server state=started enabled=true
-#  sudo: true
-  tags: [redis]
+- include: redhat.yml
+  when: ansible_os_family == 'RedHat'
+  tags: redis
 
 - include: redisadmin.yml
+  tags: redis
 

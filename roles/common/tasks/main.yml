@@ -1,16 +1,19 @@
 ---
-- name: Correct TZ
+- name: Correct LocalTime
   file:
     src: /usr/share/zoneinfo/Europe/Kiev
     dest: /etc/localtime
     state: hard
 
-- name: Correct LC
+- name: Correct TimeZone
   shell: echo "Europe/Kiev" > /etc/timezone
 
 - include: debian.yml
   when: ansible_os_family == 'Debian'
+  tags: common
 
 - include: redhat.yml
   when: ansible_os_family == 'RedHat'
+  tags: common
+
 

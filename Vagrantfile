@@ -19,8 +19,6 @@ Vagrant.configure("2") do |config|
       machine.vm.network :private_network, ip: ip
       machine.vm.provider "virtualbox" do |v|
           v.name = name
-#          v.cpus = 1
-#          v.memory = 256
           v.customize ['modifyvm', :id, '--cableconnected1', 'on']
           v.customize ["modifyvm", :id, "--memory", 256]
           v.customize ["modifyvm", :id, "--cpus", 1]

@@ -1,19 +1,21 @@
-
-- git:
+---
+- name: Clone phpRedisAdmin to /usr/share/
+  git:
     repo: 'https://github.com/ErikDubbelboer/phpRedisAdmin.git'
-    dest: /etc/redis/admin
+    dest: /usr/share/phpredisadmin
     clone: yes
     update: yes
 
-- git:
+- name: Clone Vendor to /usr/share/phpredisadmin/
+  git:
     repo: 'https://github.com/nrk/predis.git'
-    dest: /etc/redis/admin/vendor
+    dest: /usr/share/phpredisadmin/vendor
     clone: yes
     update: yes
 
-- name: Link to Web
+- name: phpRedisAdmin link to web
   file:
-    src: /etc/redis/admin
-    dest: /var/www/html/redisadmin
+    src: /usr/share/phpredisadmin
+    dest: /var/www/html/phpredisadmin
     state: link
 

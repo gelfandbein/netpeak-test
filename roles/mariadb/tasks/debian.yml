@@ -1,0 +1,109 @@
+---
+- name: Install packages MariaDB "{{ mariadb_version }}"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "mariadb-server={{ mariadb_version }}"
+  become: true
+
+#- name: Install MariaDB "{{ mariadb_version }}"
+#  apt:
+#    name: mariadb-server="{{ mariadb_version }}"
+#    state: present
+#    update_cache: yes
+
+- name: Adds Python MySQL support on Debian/Ubuntu
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-pymysql
+
+- name: Determine required MySQL Python libraries.
+  set_fact:
+    deb_mysql_python_package: "{% if 'python3' in ansible_python_interpreter|default('') %}python3-mysqldb{% else %}python-mysqldb{% endif %}"
+
+- name: Ensure MySQL Python libraries are installed.
+  apt: "name={{ deb_mysql_python_package }} state=present"
+
+- name: Ensure MySQL is up-and-running
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+  tags: [mysql, mariadb]
+
+- name: Sets the root password
+  mysql_user:
+    name: root
+    password: "{{ mysql_root_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  no_log: true
+
+- name: Removes all anonymous user accounts
+  mysql_user:
+    name: ''
+    host_all: yes
+    state: absent
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+
+- name: Removes the MySQL test database
+  mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+
+- name: Copy .my.cnf file with root password credentials
+  template:
+    src: templates/my.cnf
+    dest: /root/.my.cnf
+    owner: root
+    mode: 0600
+
+- name: Is root password set?
+  command: mysql -u root --execute "SELECT NOW()"
+  register: is_root_password_set
+  ignore_errors: yes
+  tags: [mysql, mariadb]
+
+#- name: Generate mysql root password
+#  shell: tr -d -c "a-zA-Z0-9" < /dev/urandom | head -c 15
+#  register: mysql_root_password
+#  when: is_root_password_set.rc == 0
+
+#- debug:
+#    var: mysql_root_password
+
+#- name: Set root password
+#  mysql_user: user=root password="{{mysql_root_password}}" host=localhost
+#  when: is_root_password_set.rc == 0
+
+#- name: Set root password for other hosts
+#  mysql_user: user=root password="{{mysql_root_password}}" host="{{item}}" login_user="root" login_host="localhost" login_password="{{mysql_root_password}}"
+#  when: is_root_password_set.rc == 0
+#  with_items:
+#    - "127.0.0.1"
+#    - "::1"
+
+- name: Inform user of mysql root password
+  debug:
+    msg: "MariaDB root password was set to {{ mysql_root_password }}"
+  when: is_root_password_set.rc == 0
+#  no_log: true
+
+
+- name: Secures the MySQL root user for IPV6 localhost (::1)
+  mysql_user: user="root" password="{{ mysql_root_password }}" host="::1"
+
+- name: Secures the MySQL root user for IPV4 localhost (127.0.0.1)
+  mysql_user: user="root" password="{{ mysql_root_password }}" host="127.0.0.1"
+
+- name: Secures the MySQL root user for localhost domain (localhost)
+  mysql_user: user="root" password="{{ mysql_root_password }}" host="localhost"
+
+- name: Secures the MySQL root user for server_hostname domain
+  mysql_user: user="root" password="{{ mysql_root_password }}" host="{{ ansible_fqdn }}"
+

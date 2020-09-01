@@ -1,0 +1,14 @@
+---
+## installs and sets up Mariadb
+- name: Adds Python MySQL support on RedHat/CentOS
+  yum: name=mariadb-server state=present
+  with_items:
+    - MySQL-python
+
+- name: Ensure MySQL is up-and-running
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+  tags: [mysql, mariadb]
+
