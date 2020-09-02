@@ -1,0 +1,33 @@
+---
+- name: ntp | Debian | Install the required packages in Debian derivatives
+  apt:
+    name: ntp
+    update_cache: yes
+    cache_valid_time: 86400
+    state: "{{ ntp_pkg_state }}"
+  register: task_result
+  until: task_result is success
+  retries: 3
+  delay: 2
+  when: ntp_install|bool
+  tags: [ common, ntp ]
+
+- name: NTP | Copy the ntp.conf template file
+  template:
+    src: ntp.conf.j2
+    dest: /etc/ntp.conf
+  notify:
+    - restart ntp
+  tags: [ common, ntp ]
+
+- name: NTP | Start/stop ntp service
+  service:
+    name: "{{ ntp_service_name }}"
+    state: "{{ ntp_service_state }}"
+    enabled: "{{ ntp_service_enabled }}"
+    pattern: '/ntpd'
+  when: ansible_service_mgr != "systemd"
+  tags: [ common, ntp ]
+
+
+

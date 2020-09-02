@@ -1,0 +1,62 @@
+---
+- name: UFW | Install UFW
+  apt:
+    name: ufw
+    install_recommends: '{{ install_recommends }}'
+  when: ufw_enabled|bool
+  tags: [ common, ufw ]
+
+- name: UFW | Deny all other incoming traffic by default
+  ufw:
+    policy: deny
+    direction: incoming
+  tags: [ common, ufw ]
+
+- name: UFW | Allow SSH & WWW connections
+  ufw:
+    rule: allow
+    state: enabled
+    name: '{{ item }}'
+  with_items:
+    - SSH
+    - WWW
+  tags: [ common, ufw ]
+
+- name: UFW | Stop spam UFW logs to other system files
+  lineinfile:
+    path: /etc/rsyslog.d/20-ufw.conf
+    state: present
+    regexp: '^#?& stop'
+    line: '& stop'
+  notify: restart rsyslog
+  tags: [ common, ufw ]
+
+# PORTs VERSION
+#- name: UFW | Initial Setup of firewall (tcp)
+#  ufw:
+#    rule: allow
+#    proto: tcp
+#    to_port: '{{ item }}'
+#  with_items:
+#    - ftp
+#    - ssh
+#    - http
+#    - https
+#    - ssmtp
+#    - smtp
+#    - pop3
+#    - pop3s
+#    - imap
+#    - imaps
+#    - domain
+#  tags: [ common, ufw ]
+
+#- name: UFW | Initial setup of firewall (udp)
+#  ufw:
+#    rule: allow
+#    proto: udp
+#    to_port: '{{ item }}'
+#  with_items:
+#    - domain
+#  tags: [ common, ufw ]
+

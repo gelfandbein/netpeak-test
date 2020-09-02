@@ -1,0 +1,5 @@
+---
+# main vars
+ufw_enabled: true
+install_recommends: no
+

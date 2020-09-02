@@ -1,33 +1,46 @@
 ---
-
 - hosts: all
+  # gather_facts: no
+  # user: root
+  # no_log: True
   roles:
-  -
-    role: common
-    tags: [init, common]
+  - role: common
+    vars:
+      - timezone: 'Europe/Kiev'
+      - locale: 'en_US.UTF-8'
+      - create_user: 'deployer'
+      - common_packages: [ 'sudo', 'curl', 'vim', 'python3' ]
+      - install_recommends: no
+    tags: [ common ]
 
-- hosts: all
-  user: root
-  roles:
-  -
-    role: rsyslog
-    tags: [init, rsyslog]
-  -
-    role: nginx
-    tags: [www, nginx]
-  -
-    role: php
-    tags: [www, php]
-  -
-    role: phpmyadmin
-    tags: [www, phpmyadmin]
-  -
-    role: redis
-    tags: [init, redis]
-  -
-    role: mariadb
-    tags: [mysql, mariadb]
-  -
-    role: finish
-    tags: [end, finish]
+  - role: mysql
+    vars:
+      - mysql_install: true
+      - mysql_version: 10
+      - mysql_user_password: '123123123'
+      - mysql_root_password_update: true
+    tags: [ mysql ]
+
+  - role: nginx
+    tags: [ www, nginx ]
+
+  - role: php
+    vars:
+      php_version: '7.3'
+    tags: [ www, php ]
+
+  - role: phpmyadmin
+    tags: [ www, phpmyadmin ]
+
+  - role: redis
+    vars:
+      - git_install: true
+      - install_phpRedisAdmin: true
+      - install_recommends: no
+    tags: [ redis ]
+
+  - role: finish
+    tags: [ finish ]
+
+
 

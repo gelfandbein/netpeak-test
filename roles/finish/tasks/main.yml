@@ -1,25 +1,28 @@
 ---
-#- debug:
-#    var:  "{{common_updates.stdout_lines|last}}"
+- name: add OS specific variables
+  include_vars: '{{ loop_vars }}'
+  with_first_found:
+    - files:
+        - '{{ distribution }}-{{ distribution_version }}.yml'
+        - '{{ distribution }}-{{ distribution_major_version }}.yml'
+        - '{{ distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - '{{ ansible_system }}.yml'
+        - 'defaults.yml'
+      paths:
+        - 'vars'
+  loop_control:
+    loop_var: loop_vars
+  vars:
+    distribution: '{{ ansible_distribution }}'
+    distribution_version: '{{ ansible_distribution_version }}'
+    distribution_major_version: '{{ ansible_distribution_major_version }}'
+  tags: [ common, logrotate ]
 
-- name: Gather Package facts
-  package_facts:
-    manager: auto
+# Setup/install tasks.
+- include_tasks: Debian.yml
+  when: ansible_os_family == 'Debian'
 
-#- debug:
-#    var: "{{ item }} is installed"
-#  when: "{{ item }} in ansible_facts.packages"
-#  with_items:
-#    - mariadb-server
-#    - nginx
-#    - php
-
-- name: Remove useless packages from the cache
-  apt:
-    autoclean: yes
-
-- name: Remove dependencies that are no longer required
-  apt:
-    autoremove: yes
-  ignore_errors: yes
+- include_tasks: RedHat.yml
+  when: ansible_os_family == 'RedHat'
 

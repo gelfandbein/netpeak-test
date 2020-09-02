@@ -1,0 +1,47 @@
+---
+- name: add OS specific variables
+  include_vars: '{{ loop_vars }}'
+  with_first_found:
+    - files:
+        - '{{ distribution }}-{{ distribution_version }}.yml'
+        - '{{ distribution }}-{{ distribution_major_version }}.yml'
+        - '{{ distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - '{{ ansible_system }}.yml'
+        - 'defaults.yml'
+      paths:
+        - 'vars'
+  loop_control:
+    loop_var: loop_vars
+  vars:
+    distribution: '{{ ansible_distribution }}'
+    distribution_version: '{{ ansible_distribution_version }}'
+    distribution_major_version: '{{ ansible_distribution_major_version }}'
+  tags: [ mysql ]
+
+- include_tasks: '{{ ansible_os_family }}.yml'
+  tags: [ mysql ]
+
+# Variable configuration.
+- include_tasks: variables.yml
+  tags: [ mysql ]
+
+- name: Check if MySQL packages were installed.
+  set_fact:
+    mysql_install_packages: "{{ (rh_mysql_install_packages is defined and rh_mysql_install_packages.changed)
+      or (deb_mysql_install_packages is defined and deb_mysql_install_packages.changed)
+      or (arch_mysql_install_packages is defined and arch_mysql_install_packages.changed) }}"
+  tags: [ mysql ]
+
+# Configure MySQL.
+- include_tasks: configure.yml
+  tags: [ mysql ]
+- include_tasks: secure-installation.yml
+  tags: [ mysql ]
+- include_tasks: databases.yml
+  tags: [ mysql ]
+- include_tasks: users.yml
+  tags: [ mysql ]
+- include_tasks: replication.yml
+  tags: [ mysql ]
+

@@ -1,0 +1,6 @@
+---
+- hosts: all
+  roles:
+    - preconf
+  vars:
+    #some vars here

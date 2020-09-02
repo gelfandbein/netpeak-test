@@ -1,0 +1,31 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: ansible_playbook
+  hosts: test-kitchen
+  ansible_verbosity: 2
+  ansible_verbose: true
+  require_ansible_repo: false
+  require_chef_omnibus: false
+  require_ansible_omnibus: true
+  require_chef_for_busser: false
+  ansible_omnibus_url: https://raw.githubusercontent.com/neillturner/omnibus-ansible/master/ansible_install.sh
+  idempotency_test: true
+
+platforms:
+  - name: debian-6.0.10-64-nocm
+    driver_config: 
+      customize:
+           memory: 1024
+           cpus: 2
+      box: puppetlabs/debian-6.0.10-64-nocm
+      box_url: https://atlas.hashicorp.com/puppetlabs/boxes/debian-6.0.10-64-nocm/versions/1.0.2/providers/virtualbox.box
+
+
+suites:
+  - name: default
+
+verifier:
+  ruby_bindir: '/usr/bin'

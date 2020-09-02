@@ -1,0 +1,12 @@
+---
+- include: debian.yml
+  when: ansible_os_family == 'Debian'
+  tags: redis
+
+- include: redhat.yml
+  when: ansible_os_family == 'RedHat'
+  tags: redis
+
+- include: redisadmin.yml
+  tags: redis
+

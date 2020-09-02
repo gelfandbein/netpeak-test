@@ -1,0 +1,11 @@
+---
+# locale & time
+timezone: 'Europe/Kiev'
+locale: 'en_US.UTF-8'
+
+# main vars
+create_user: 'deployer'
+copy_local_key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+common_packages: [ 'sudo', 'curl', 'vim', 'python3' ]
+install_recommends: no
+

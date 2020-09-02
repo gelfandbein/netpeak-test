@@ -9,7 +9,7 @@ COPY ./docker.sh .
 COPY ./id_rsa.pub .
 
 # default layer
-RUN apt-get update && apt-get dist-upgrade && apt-get install -yqq ssh python
+RUN apt-get update && apt-get dist-upgrade && apt-get install -yqq ssh python3
 
 EXPOSE 80
 

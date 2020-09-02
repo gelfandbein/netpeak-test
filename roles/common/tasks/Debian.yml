@@ -1,0 +1,68 @@
+---
+- name: '--> APT update && APT dist-upgrade'
+  include_role:
+    name: apt
+  tags: [ common, apt ]
+
+- name: '--> Install common system packages: {{ setup_packages }}'
+  apt:
+    name: '{{ setup_packages }}'
+    state: latest
+    install-recommends: '{{ install_recommends }}'
+  tags: [ common ]
+
+- name: '--> Ensure a {{ locale }} locale exists'
+  locale_gen:
+    name: '{{ locale }}'
+    state: present
+  tags: [ common ]
+
+- name: '--> Set timezone to {{ timezone }}'
+  timezone:
+    name: '{{ timezone }}'
+  # changed_when: current_zone.stdout != '{{ timezone }}'
+  notify:
+    - update timezone
+  tags: [ common ]
+
+#- name: '--> Correct LocalTime'
+#  file:
+#    src: /usr/share/zoneinfo/Europe/Kiev
+#    dest: /etc/localtime
+#    state: hard
+#  tags: [ common ]
+
+- name: '--> run NTP role <--'
+  include_role:
+    name: ntp
+  tags: [ common, ntp ]
+
+- name: '--> run RSYSLOG role <--'
+  include_role:
+    name: rsyslog
+  tags: [ common, rsyslog ]
+
+- include: user.yml
+  tags: [ common, user ]
+
+- name: '--> run SSHD role <--'
+  include_role:
+    name: sshd
+  tags: [ common, sshd ]
+
+- name: '--> run UFW role <--'
+  include_role:
+    name: ufw
+  tags: [ common, ufw ]
+
+- name: '--> run CRON role ---'
+  include_role:
+    name: cron
+  tags: [ common, cron ]
+
+- name: '--> run LOGROTATE role <--'
+  include_role:
+    name: logrotate
+  tags: [ common, logrotate ]
+
+
