@@ -2,7 +2,6 @@
 mysql_daemon: mysql
 mysql_packages:
   - default-mysql-server
-  - python-pymysql
 mysql_log_file_group: adm
 mysql_slow_query_log_file: /var/log/mysql/mysql-slow.log
 mysql_log_error: /var/log/mysql/mysql.log

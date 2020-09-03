@@ -9,6 +9,7 @@ mysql_user_password: root
 mysql_root_home: /root
 mysql_root_username: root
 mysql_root_password: root
+mysql_root_hosts: '127.0.0.1'
 
 # Set this to `true` to forcibly update the root password.
 mysql_root_password_update: false
@@ -34,7 +35,7 @@ mysql_enablerepo: ""
 #  - mysql-common
 
 #      "{% if 'python3' in ansible_python_interpreter|default('') %}python3-mysqldb{% else %}python-mysqldb{% endif %}"
-mysql_python_package_debian: python3-mysqldb
+mysql_python_package_debian: [ 'python3-pymysql', 'python3-mysqldb' ]
 
 # MySQL connection settings.
 mysql_port: "3306"

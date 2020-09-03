@@ -1,10 +1,8 @@
 ---
-- name: Install packages MariaDB "{{ mariadb_version }}"
+- name: Install packages MariaDB
   apt:
-    name: "{{ item }}"
+    name: mariadb-server
     state: present
-  with_items:
-    - "mariadb-server={{ mariadb_version }}"
   become: true
 
 #- name: Install MariaDB "{{ mariadb_version }}"
@@ -34,13 +32,40 @@
     enabled: yes
   tags: [mysql, mariadb]
 
-- name: Sets the root password
-  mysql_user:
-    name: root
-    password: "{{ mysql_root_password }}"
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-  # check_implicit_admin: yes
-  no_log: true
+#- name: Sets the root password
+#  mysql_user:
+#    name: root
+#    password: "{{ mysql_root_password }}"
+#    login_unix_socket: /var/run/mysqld/mysqld.sock
+#    check_implicit_admin: yes
+  # no_log: true
+#- name: Specify MySQL root password before installing
+ # debconf: name='mysql-server' question='mysql-server/root_password' value='{{mysql_root_password | quote}}' vtype='password'
+ # become: true
+
+#- name: Confirm MySQL root password before installing
+ # debconf: name='mysql-server' question='mysql-server/root_password_again' value='{{mysql_root_password | quote}}' vtype='password'
+ # become: true
+
+# 'localhost' needs to be the last item for idempotency, see
+# http://ansible.cc/docs/modules.html#mysql-user
+#- name: update mysql root password for all root accounts
+#  become: true
+#  mysql_user: name=root host={{ item }} password={{ mysql_root_password }} priv=*.*:ALL,GRANT
+#  with_items:
+#    - "{{ ansible_hostname }}"
+#    - 127.0.0.1
+#    - ::1
+#    - localhost
+
+- name: MySQL | Set the root password.
+  action: mysql_user user=root password={{ mysql_root_password }} host=localhost
+
+- name: Update mysql root password
+  mysql_user: name=root host={{ item }} password={{ mysql_root_password }}
+  with_items:
+    - 127.0.0.1
+    - localhost
 
 - name: Removes all anonymous user accounts
   mysql_user:

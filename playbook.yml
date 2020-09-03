@@ -16,8 +16,8 @@
   - role: mysql
     vars:
       - mysql_install: true
-      - mysql_version: 10
-      - mysql_user_password: '123123123'
+      - mysql_version: 10.0
+      - mysql_root_password: '123123123123'
       - mysql_root_password_update: true
     tags: [ mysql ]
 
