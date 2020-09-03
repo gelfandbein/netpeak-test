@@ -1,15 +1,16 @@
 ---
-- name: SSHD | ensure sshd is installed
+- name: '--> install sshd package'
   apt:
     name: openssh-server
     state: present
+    install_recommends: '{{ install_recommends }}'
   when: sshd_install|bool
   tags: [ common, sshd ]
 
 # Opt for lineinfile as this is a file tightly tied to security and we
 # don't want to template in the entire thing and risk breaking something
 # that changes by the packager or distro default files
-- name: SSHD | disable sshd password auth
+- name: '--> disable sshd password auth'
   lineinfile:
     dest: "{{ sshd_config_file }}"
     state: present
@@ -21,7 +22,7 @@
   notify: restart sshd
   tags: [ common, sshd ]
 
-- name: SSHD | disable root login
+- name: '--> disable root login'
   lineinfile:
     dest: "{{ sshd_config_file }}"
     state: present

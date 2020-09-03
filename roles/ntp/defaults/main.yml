@@ -1,5 +1,6 @@
 ---
 ntp_install: true
+install_recommends: no
 
 ntp_pkg_state: present
 ntp_service_state: started

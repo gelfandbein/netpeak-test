@@ -1,18 +1,18 @@
 ---
-- name: UFW | Install UFW
+- name: '--> install ufw'
   apt:
     name: ufw
     install_recommends: '{{ install_recommends }}'
   when: ufw_enabled|bool
   tags: [ common, ufw ]
 
-- name: UFW | Deny all other incoming traffic by default
+- name: '--> deny all other incoming traffic by default'
   ufw:
     policy: deny
     direction: incoming
   tags: [ common, ufw ]
 
-- name: UFW | Allow SSH & WWW connections
+- name: '--> allow ssh & www connections'
   ufw:
     rule: allow
     state: enabled
@@ -22,7 +22,7 @@
     - WWW
   tags: [ common, ufw ]
 
-- name: UFW | Stop spam UFW logs to other system files
+- name: '--> stop spam ufw logs to system logs'
   lineinfile:
     path: /etc/rsyslog.d/20-ufw.conf
     state: present
@@ -32,7 +32,7 @@
   tags: [ common, ufw ]
 
 # PORTs VERSION
-#- name: UFW | Initial Setup of firewall (tcp)
+#- name: '--> initial setup of firewall (tcp)'
 #  ufw:
 #    rule: allow
 #    proto: tcp
@@ -51,7 +51,7 @@
 #    - domain
 #  tags: [ common, ufw ]
 
-#- name: UFW | Initial setup of firewall (udp)
+#- name: '--> initial setup of firewall (udp)'
 #  ufw:
 #    rule: allow
 #    proto: udp

@@ -1,37 +1,42 @@
 ---
-# Variable setup.
-- name: Include OS-specific variables.
-  include_vars: "{{ ansible_os_family }}.yml"
+- name: NGINX | add OS specific variables
+  include_vars: '{{ loop_vars }}'
+  with_first_found:
+    - files:
+        - '{{ distribution }}-{{ distribution_version }}.yml'
+        - '{{ distribution }}-{{ distribution_major_version }}.yml'
+        - '{{ distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - '{{ ansible_system }}.yml'
+        - 'defaults.yml'
+      paths:
+        - 'vars'
+  loop_control:
+    loop_var: loop_vars
+  vars:
+    distribution: '{{ ansible_distribution }}'
+    distribution_version: '{{ ansible_distribution_version }}'
+    distribution_major_version: '{{ ansible_distribution_major_version }}'
+  tags: [ nginx, www ]
 
-- name: Define nginx_user.
+
+- include_tasks: '{{ ansible_os_family }}.yml'
+  tags: [ nginx, www ]
+
+
+- name: '--> define nginx_user'
   set_fact:
     nginx_user: "{{ __nginx_user }}"
   when: nginx_user is not defined
+  tags: [ nginx, www ]
 
-# Setup/install tasks.
-- include_tasks: setup-RedHat.yml
-  when: ansible_os_family == 'RedHat'
-
-- include_tasks: setup-Ubuntu.yml
-  when: ansible_distribution == 'Ubuntu'
-
-- include_tasks: setup-Debian.yml
-  when: ansible_os_family == 'Debian'
-
-- include_tasks: setup-FreeBSD.yml
-  when: ansible_os_family == 'FreeBSD'
-
-- include_tasks: setup-OpenBSD.yml
-  when: ansible_os_family == 'OpenBSD'
-
-- include_tasks: setup-Archlinux.yml
-  when: ansible_os_family == 'Archlinux'
 
 # Vhost configuration.
 - import_tasks: vhosts.yml
+  tags: [ nginx, www ]
 
 # Nginx setup.
-- name: Copy nginx configuration in place.
+- name: '--> copy nginx configuration in place'
   template:
     src: "{{ nginx_conf_template }}"
     dest: "{{ nginx_conf_file_path }}"
@@ -40,9 +45,16 @@
     mode: 0644
   notify:
     - reload nginx
+  tags: [ nginx, www ]
 
-- name: Ensure nginx service is running as configured.
+- name: '--> ensure nginx service is running as configured'
   service:
     name: nginx
     state: "{{ nginx_service_state }}"
     enabled: "{{ nginx_service_enabled }}"
+  tags: [ nginx, www ]
+
+
+
+
+

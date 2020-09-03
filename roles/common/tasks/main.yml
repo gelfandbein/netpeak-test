@@ -1,5 +1,5 @@
 ---
-- name: add OS specific variables
+- name: COMMON | add OS specific variables
   include_vars: '{{ loop_vars }}'
   with_first_found:
     - files:
@@ -25,7 +25,6 @@
 
 
 - include_tasks: '{{ ansible_os_family }}.yml'
-  when: ansible_os_family == 'Debian'
   tags: [ common ]
 
 

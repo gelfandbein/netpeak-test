@@ -1,12 +1,13 @@
 ---
-- name: RSYSLOG | apt install (Debian)
+- name: '--> apt install (Debian)'
   apt:
     name: rsyslog
     state: latest
+    install_recommends: '{{ install_recommends }}'
   when: rsyslog_install|bool
   tags: [ common, rsyslog ]
 
-#- name: RSYSLOG | Create Directory for logs
+#- name: '--> create Directory for logs'
 #  file: path={{ rsys_dir }} owner=root group=root mode=0644 state=directory
 #  tags: [ common, rsyslog ]
 
@@ -16,6 +17,8 @@
 #   - restart rsyslog
 #  tags: [ common, rsyslog ]
 
-- name: RSYSLOG | Start rsyslog Service
+- name: '--> start rsyslog service'
   service: name=rsyslog state=started enabled=true
   tags: [ common, rsyslog ]
+
+

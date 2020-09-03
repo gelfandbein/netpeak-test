@@ -1,1 +1,3 @@
 rsyslog_install: true
+install_recommends: no
+

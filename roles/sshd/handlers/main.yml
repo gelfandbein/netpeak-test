@@ -1,10 +1,10 @@
-- name: restart sshd
+- name: '--> restart ssh'
   become: "{{ sshd_become }}"
   become_user: "{{ sshd_become_user }}"
   service:
-    name: sshd
+    name: ssh
     state: restarted
   notify: wait for reconnect
 
-- name: wait for reconnect
+- name: 'wait for reconnect'
   wait_for_connection:

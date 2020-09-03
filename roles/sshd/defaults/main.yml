@@ -1,4 +1,8 @@
+---
 sshd_install: true
+install_recommends: no
+sshd_version: latest
+
 sshd_become: true
 sshd_become_user: root
 sshd_allow_password_login: false

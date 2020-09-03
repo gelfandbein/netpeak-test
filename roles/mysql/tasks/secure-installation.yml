@@ -1,16 +1,10 @@
 ---
 - debug:
-    msg: 'WARNING - you have to change default mysql_root_password'
+    msg: '--> WARNING - you have to change default "mysql_root_password"'
   when: mysql_root_password == 'root'
+  tags: [ mysql ]
 
-#- name: root password is present
-#  mysql_user:
-#    name: 'root'
-#    host_all: true
-#    password: '{{ mysql_root_password | mandatory }}'
-#    state: present
-
-- name: Ensure default user is present.
+- name: '--> ensure default user is present'
   mysql_user:
     # login_unix_socket: '{{ mysql_socket }}'
     # check_implicit_admin: yes
@@ -23,9 +17,8 @@
   when: mysql_user_name != mysql_root_username
   tags: [ mysql ]
 
-
 # Has to be after the password assignment, for idempotency.
-- name: Copy user-my.cnf file with password credentials.
+- name: '--> copy user-my.cnf file with password credentials'
   template:
     src: 'user-my.cnf.j2'
     dest: '{{ mysql_user_home }}/.my.cnf'
@@ -37,41 +30,41 @@
   tags: [ mysql ]
 
 # Check existence and authentication plugin of the user to configure
-- name: 'Get user'
-  shell: |
-    mysql -u {{ mysql_root_username }} -p'{{ mysql_root_password }}' -NBe 'SELECT plugin FROM mysql.user WHERE Host="{{ mysql_root_hosts }}" AND User = "{{ mysql_root_username }}"'
-  failed_when: no
-  changed_when: no
-  register: mysql_plugin_output
+#- name: '--> get user'
+#  shell: |
+#    mysql -u {{ mysql_root_username }} -p'{{ mysql_root_password }}' -NBe 'SELECT plugin FROM mysql.user WHERE Host="{{ mysql_root_hosts }}" AND User = "{{ mysql_root_username }}"'
+#  failed_when: no
+#  changed_when: no
+#  register: mysql_plugin_output
+#  tags: [ mysql ]
 
-- debug:
-    msg: '{{ mysql_plugin_output }}'
-  when: mysql_plugin_output
-
-# Set root password for MySQL
-- name: Update MySQL root password for localhost root account thouch unix socket.
+###
+### ___SOCKET___ VERSION CHANGE PASSWORD. ALWAYS WORK.
+###
+- name: '--> sets the root password (___by socket___)'
   mysql_user:
-#    login_unix_socket: '{{ mysql_socket }}'
-    name: '{{ mysql_root_username }}'
+    name: root
     password: '{{ mysql_root_password }}'
-#    host_all: true
-    login_user: '{{ mysql_root_username }}'
-#    login_password: '{{ mysql_root_password }}'
-#    login_host: '{{ item }}'
-    state: present
-#  check_implicit_admin: true
-  register: mysql_root_password_update_status
-  when: >
-    ((mysql_install_packages | bool) or mysql_root_password_update)
+    login_unix_socket: '{{ mysql_socket }}'
   tags: [ mysql ]
 
-- debug:
-    msg: '{{ mysql_root_password_update_status }}'
-  when: >
-    ((mysql_install_packages | bool) or mysql_root_password_update_status)
+###
+### ___CLI___ VERSION CHANGE PASSWORD. Don't works if mysql service not running.
+###
+#- name: '--> update MySQL root password for localhost root account (___cli___ version)'
+#  mysql_user:
+#    name: '{{ mysql_root_username }}'
+#    password: '{{ mysql_root_password }}'
+###    login_user: '{{ mysql_root_username }}'
+#    state: present
+###  check_implicit_admin: true
+###  register: mysql_root_password_update_status
+#  when: >
+#    ((mysql_install_packages | bool) or mysql_root_password_update)
+#  tags: [ mysql ]
 
 # Has to be after the root password assignment, for idempotency.
-- name: Copy .my.cnf file with root password credentials.
+- name: '--> copy .my.cnf file with root password credentials'
   template:
     src: 'root-my.cnf.j2'
     dest: '{{ mysql_root_home }}/.my.cnf'
@@ -81,25 +74,30 @@
   when: mysql_install_packages | bool or mysql_root_password_update
   tags: [ mysql ]
 
-- name: Get list of hosts for the anonymous user.
+- name: '--> get list of hosts for the anonymous user'
   command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
   register: mysql_anonymous_hosts
   changed_when: false
   check_mode: false
   tags: [ mysql ]
 
-- name: Remove anonymous MySQL users.
+- name: '--> remove anonymous MySQL users'
   mysql_user:
-    name: ""
-    host: "{{ item }}"
+    name: ''
+    host: '{{ item }}'
     state: absent
-  with_items: "{{ mysql_anonymous_hosts.stdout_lines|default([]) }}"
+  with_items: '{{ mysql_anonymous_hosts.stdout_lines|default([]) }}'
   tags: [ mysql ]
 
-- name: Remove MySQL test database.
-  mysql_db: "name='test' state=absent"
+- name: '--> remove MySQL test database'
+  mysql_db:
+    name: 'test'
+    state: absent
   tags: [ mysql ]
 
 
-
-
+- name: '--> ensure MySQL is started after secure install'
+  service:
+    name: '{{ mysql_daemon }}'
+    state: started
+  tags: [ mysql ]

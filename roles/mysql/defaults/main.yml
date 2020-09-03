@@ -15,7 +15,9 @@ mysql_root_hosts: '127.0.0.1'
 mysql_root_password_update: false
 mysql_user_password_update: false
 
+mysql_version: latest
 mysql_install: true
+install_recommends: no
 mysql_enabled_on_startup: true
 
 # Whether my.cnf should be updated on every run.

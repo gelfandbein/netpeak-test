@@ -1,68 +1,80 @@
 ---
-- name: '--> APT update && APT dist-upgrade'
-  include_role:
-    name: apt
+- name: '--> Update repository and ugprade OS to latest (Debian)'
+  apt:
+    # name: '*'
+    upgrade: dist
+    update_cache: yes
+    cache_valid_time: 86400
+    state: latest
+    install_recommends: '{{ install_recommends }}'
   tags: [ common, apt ]
 
-- name: '--> Install common system packages: {{ setup_packages }}'
+- name: '--> install common system packages: {{ common_packages }}'
   apt:
-    name: '{{ setup_packages }}'
+    name: '{{ common_packages }}'
     state: latest
     install-recommends: '{{ install_recommends }}'
   tags: [ common ]
 
-- name: '--> Ensure a {{ locale }} locale exists'
+# !!! need to be installed 'locales' package for this task
+- name: '--> ensure a "{{ locale }}" locale exists'
   locale_gen:
     name: '{{ locale }}'
     state: present
+  register: locales_done
   tags: [ common ]
 
-- name: '--> Set timezone to {{ timezone }}'
+- name: '--> set timezone to "{{ timezone }}"'
   timezone:
     name: '{{ timezone }}'
   # changed_when: current_zone.stdout != '{{ timezone }}'
   notify:
     - update timezone
+  register: timezone_done
   tags: [ common ]
 
-#- name: '--> Correct LocalTime'
+#- name: '--> correct LocalTime'
 #  file:
 #    src: /usr/share/zoneinfo/Europe/Kiev
 #    dest: /etc/localtime
 #    state: hard
 #  tags: [ common ]
 
-- name: '--> run NTP role <--'
-  include_role:
-    name: ntp
-  tags: [ common, ntp ]
-
-- name: '--> run RSYSLOG role <--'
-  include_role:
-    name: rsyslog
-  tags: [ common, rsyslog ]
-
-- include: user.yml
+# Sudo Group Setup
+- name: '--> make sure we have a "wheel" group'
+  group:
+    name: wheel
+    state: present
   tags: [ common, user ]
 
-- name: '--> run SSHD role <--'
-  include_role:
-    name: sshd
-  tags: [ common, sshd ]
+- name: '--> allow "wheel" group to have passwordless sudo'
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: '/usr/sbin/visudo -cf %s'
+  tags: [ common, user ]
 
-- name: '--> run UFW role <--'
-  include_role:
-    name: ufw
-  tags: [ common, ufw ]
+# User + Key Setup
+- name: '--> create a new regular user with sudo privileges'
+  user:
+    name: '{{ create_user }}'
+    state: present
+    groups: wheel
+    append: true
+    create_home: true
+    shell: /bin/bash
+  tags: [ common, user ]
 
-- name: '--> run CRON role ---'
-  include_role:
-    name: cron
-  tags: [ common, cron ]
+- name: '--> set authorized key for remote user'
+  authorized_key:
+    user: '{{ create_user }}'
+    state: present
+    key: "{{ copy_local_key|default(lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub')) }}"
+  tags: [ common, user ]
 
-- name: '--> run LOGROTATE role <--'
-  include_role:
-    name: logrotate
-  tags: [ common, logrotate ]
+
+
 
 

@@ -1,5 +1,5 @@
 ---
-- name: add OS specific variables
+- name: MYSQL | add OS specific variables
   include_vars: '{{ loop_vars }}'
   with_first_found:
     - files:
@@ -22,6 +22,15 @@
 - include_tasks: '{{ ansible_os_family }}.yml'
   tags: [ mysql ]
 
+#- vars_prompt:
+#    - name: mysql_version
+#      prompt: 'What version MariaDB to install?'
+#      default: 'latest'
+#      private: no
+
+- debug:
+    msg: 'mysql_version'
+
 # Variable configuration.
 - include_tasks: variables.yml
   tags: [ mysql ]
@@ -33,7 +42,7 @@
       or (arch_mysql_install_packages is defined and arch_mysql_install_packages.changed) }}"
   tags: [ mysql ]
 
-# Configure MySQL.
+# Configure MySQL
 - include_tasks: configure.yml
   tags: [ mysql ]
 - include_tasks: secure-installation.yml

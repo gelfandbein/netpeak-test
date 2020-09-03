@@ -1,5 +1,5 @@
 ---
-- name: LOGROTATE | Install logrotate packages
+- name: '--> install logrotate packages'
   become: true
   apt:
     name: '{{ logrotate_package }}'
@@ -12,7 +12,7 @@
   delay: 2
   tags: [ common, logrotate ]
 
-- name: LOGROTATE | Create logrotate configuration file
+- name: '--> create logrotate configuration file'
   become: true
   template:
     src: 'etc/logrotate.conf.j2'
@@ -22,7 +22,7 @@
     mode: 0644
   tags: [ common, logrotate ]
 
-- name: LOGROTATE | create logrotate application configuration files
+- name: '--> create logrotate application configuration files'
   become: true
   template:
     src: 'etc/logrotate.d/application.j2'
@@ -34,7 +34,7 @@
     - '{{ logrotate_applications }}'
   tags: [ common, logrotate ]
 
-- name: LOGROTATE | Symlink for hourly rotation
+- name: '--> symlink for hourly rotation'
   file:
     src: '/etc/cron.daily/logrotate'
     dest: '/etc/cron.hourly/logrotate'

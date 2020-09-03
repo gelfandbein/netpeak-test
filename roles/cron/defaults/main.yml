@@ -1,19 +1,20 @@
 ---
-cron__enabled: true
-cron__base_packages: [ 'cron' ]
+cron_enabled: true
+install_recommends: no
+cron_base_packages: [ 'cron' ]
 
 # List of additional APT packages to install with :program:`cron`.
-cron__packages: []
+cron_packages: []
 
 # Configuration of the periodic system jobs [[[
 # If ``present``, the custom :file:`/etc/crontab` configuration will be applied
 # on the host. If ``absent``, the original configuration will be restored.
-cron__crontab_deploy_state: 'present'
+cron_crontab_deploy_state: 'present'
 
 # A string which is used as the base of the random seed used to generate
 # various :man:`crontab(5)` time parameters. It should be unique on each host
 # in the Ansible inventory.
-cron__crontab_seed: '{{ inventory_hostname }}'
+cron_crontab_seed: '{{ inventory_hostname }}'
 
 # A list of pseudo-random strings which are randomly added to the base seed in
 # variouse :man:`crontab(5)` entries. High number of pseudo-random strings
@@ -22,7 +23,7 @@ cron__crontab_seed: '{{ inventory_hostname }}'
 #
 # The offset seeds will be stored on the remote hosts in the local fact script
 # to ensure idempotency.
-cron__crontab_offset_seeds: '{{ ansible_local.cron.crontab_offset_seeds
+cron_crontab_offset_seeds: '{{ ansible_local.cron.crontab_offset_seeds
                                 if (ansible_local.cron.crontab_offset_seeds|d())
                                 else ((ansible_all_ipv4_addresses
                                        + ansible_all_ipv6_addresses
@@ -39,145 +40,145 @@ cron__crontab_offset_seeds: '{{ ansible_local.cron.crontab_offset_seeds
 # monthly :man:`crontab(5)` entries. The role will randomly select an hour for
 # each job type. The default allows job execution outside of normal workday
 # hours.
-cron__crontab_hours: [ 0, 1, 2, 3, 4, 5, 6,
-                       19, 20, 21, 22, 23 ]
+cron_crontab_hours: [ 0, 1, 2, 3, 4, 5, 6 ]
 
 # YAML list which specifies the days of the week which will be used by the
 # weekly :man:`crontab(5)` entry. The default will execute the jobs on one of
 # the weekend days only.
-# cron__crontab_weekday_days: [ 6, 7 ]
-cron__crontab_weekday_days: [ 7 ]
+# cron_crontab_weekday_days: [ 6, 7 ]
+cron_crontab_weekday_days: [ 7 ]
 
 # YAML list which specifies the range of days to use in the monthly
 # :man:`crontab(5)` entry. The default is selected to ensure that jobs are
 # executed on the first week of each month.
-cron__crontab_day_ranges: [ 1, 7 ]
+cron_crontab_day_ranges: [ 1, 7 ]
+# cron_crontab_day_ranges: [ 1 ]
 
 # YAML dictionary which defines default set of environment variables set in the
 # :man:`crontab(5)` configuration file. Each key is a variable name and its
 # value is the contents of the variable.
-cron__crontab_default_environment:
+cron_crontab_default_environment:
   SHELL: '/bin/sh'
   PATH: '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin'
 
 # YAML dictionary with environment variables set in the :man:`crontab(5)`
 # configuration file, defined for all hosts in the Ansible inventory.
-cron__crontab_environment: {}
+cron_crontab_environment: {}
 
 # YAML dictionary with environment variables set in the :man:`crontab(5)`
 # configuration file, defined for hosts in a specific Ansible inventory group.
-cron__crontab_group_environment: {}
+cron_crontab_group_environment: {}
 
 # YAML dictionary with environment variables set in the :man:`crontab(5)`
 # configuration file, defined for specific hosts in the Ansible inventory.
-cron__crontab_host_environment: {}
+cron_crontab_host_environment: {}
 
 # Variable which combines all other :man:`crontab(5)` environment variables and
 # is used in the template.
-cron__crontab_combined_environment: '{{ cron__crontab_default_environment
-                                        | combine(cron__crontab_environment,
-                                                  cron__crontab_group_environment,
-                                                  cron__crontab_host_environment) }}'
+cron_crontab_combined_environment: '{{ cron_crontab_default_environment
+                                        | combine(cron_crontab_environment,
+                                                  cron_crontab_group_environment,
+                                                  cron_crontab_host_environment) }}'
 
 # A list of the default :man:`crontab(5)` system jobs defined by the role.
-# See :ref:`cron__ref_crontab_jobs` for more details.
-cron__crontab_default_jobs:
+# See :ref:`cron_ref_crontab_jobs` for more details.
+cron_crontab_default_jobs:
 
   - name: 'crontab-hourly'
-    minute: '{{ 59 | random(seed=(cron__crontab_seed
-                                  + (cron__crontab_offset_seeds
-                                     | random(seed=cron__crontab_offset_seeds[0])))) }}'
+    minute: '{{ 59 | random(seed=(cron_crontab_seed
+                                  + (cron_crontab_offset_seeds
+                                     | random(seed=cron_crontab_offset_seeds[0])))) }}'
     user: 'root'
     job: 'cd / && run-parts --report /etc/cron.hourly'
 
   - name: 'crontab-daily'
-    minute: '{{ 59 | random(seed=(cron__crontab_seed
-                                  + (cron__crontab_offset_seeds
-                                     | random(seed=cron__crontab_offset_seeds[1])))) }}'
-    hour: '{{ cron__crontab_hours | random(seed=(cron__crontab_seed
-                                                 + (cron__crontab_offset_seeds
-                                                    | random(seed=cron__crontab_offset_seeds[2])))) }}'
+    minute: '{{ 59 | random(seed=(cron_crontab_seed
+                                  + (cron_crontab_offset_seeds
+                                     | random(seed=cron_crontab_offset_seeds[1])))) }}'
+    hour: '{{ cron_crontab_hours | random(seed=(cron_crontab_seed
+                                                 + (cron_crontab_offset_seeds
+                                                    | random(seed=cron_crontab_offset_seeds[2])))) }}'
     user: 'root'
     job: 'test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )'
 
   - name: 'crontab-weekly'
-    minute: '{{ 49 | random(seed=(cron__crontab_seed
-                                  + (cron__crontab_offset_seeds
-                                     | random(seed=cron__crontab_offset_seeds[3])))) }}'
-    hour: '{{ cron__crontab_hours | random(seed=(cron__crontab_seed
-                                                 + (cron__crontab_offset_seeds
-                                                    | random(seed=cron__crontab_offset_seeds[4])))) }}'
-    weekday: '{{ cron__crontab_weekday_days
-                 | random(seed=(cron__crontab_seed
-                                + (cron__crontab_offset_seeds
-                                   | random(seed=cron__crontab_offset_seeds[5])))) }}'
+    minute: '{{ 49 | random(seed=(cron_crontab_seed
+                                  + (cron_crontab_offset_seeds
+                                     | random(seed=cron_crontab_offset_seeds[3])))) }}'
+    hour: '{{ cron_crontab_hours | random(seed=(cron_crontab_seed
+                                                 + (cron_crontab_offset_seeds
+                                                    | random(seed=cron_crontab_offset_seeds[4])))) }}'
+    weekday: '{{ cron_crontab_weekday_days
+                 | random(seed=(cron_crontab_seed
+                                + (cron_crontab_offset_seeds
+                                   | random(seed=cron_crontab_offset_seeds[5])))) }}'
     user: 'root'
     job: 'test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )'
 
   - name: 'crontab-monthly'
-    minute: '{{ 39 | random(seed=(cron__crontab_seed
-                                  + (cron__crontab_offset_seeds
-                                     | random(seed=cron__crontab_offset_seeds[6])))) }}'
-    hour: '{{ cron__crontab_hours | random(seed=(cron__crontab_seed
-                                                 + (cron__crontab_offset_seeds
-                                                    | random(seed=cron__crontab_offset_seeds[7])))) }}'
-    day: '{{ cron__crontab_day_ranges[1]
-             | random(start=cron__crontab_day_ranges[0],
-                      seed=(cron__crontab_seed
-                            + (cron__crontab_offset_seeds
-                               | random(seed=cron__crontab_offset_seeds[8])))) }}'
+    minute: '{{ 39 | random(seed=(cron_crontab_seed
+                                  + (cron_crontab_offset_seeds
+                                     | random(seed=cron_crontab_offset_seeds[6])))) }}'
+    hour: '{{ cron_crontab_hours | random(seed=(cron_crontab_seed
+                                                 + (cron_crontab_offset_seeds
+                                                    | random(seed=cron_crontab_offset_seeds[7])))) }}'
+    day: '{{ cron_crontab_day_ranges[1]
+             | random(start=cron_crontab_day_ranges[0],
+                      seed=(cron_crontab_seed
+                            + (cron_crontab_offset_seeds
+                               | random(seed=cron_crontab_offset_seeds[8])))) }}'
     user: 'root'
     job: 'test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )'
 
 # A list of the :man:`crontab(5)` system jobs defined on all hosts in the
-# Ansible inventory. See :ref:`cron__ref_crontab_jobs` for more details.
-cron__crontab_jobs: []
+# Ansible inventory. See :ref:`cron_ref_crontab_jobs` for more details.
+cron_crontab_jobs: []
 
 # A list of the :man:`crontab(5)` system jobs defined on hosts in a specific
-# Ansible inventory group. See :ref:`cron__ref_crontab_jobs` for more details.
-cron__crontab_group_jobs: []
+# Ansible inventory group. See :ref:`cron_ref_crontab_jobs` for more details.
+cron_crontab_group_jobs: []
 
 # A list of the :man:`crontab(5)` system jobs defined on specific hosts in the
-# Ansible inventory. See :ref:`cron__ref_crontab_jobs` for more details.
-cron__crontab_host_jobs: []
+# Ansible inventory. See :ref:`cron_ref_crontab_jobs` for more details.
+cron_crontab_host_jobs: []
 
 # The variable which combines other :man:`crontab(5)` job variables and is used
 # in the role template.
-cron__crontab_combined_jobs: '{{ cron__crontab_default_jobs
-                                 + cron__crontab_jobs
-                                 + cron__crontab_group_jobs
-                                 + cron__crontab_host_jobs }}'
+cron_crontab_combined_jobs: '{{ cron_crontab_default_jobs
+                                 + cron_crontab_jobs
+                                 + cron_crontab_group_jobs
+                                 + cron_crontab_host_jobs }}'
 
 # Scheduled job configuration [[[
 # -------------------------------
 
 # The variables below define :program:`cron` jobs managed by the :program:`cron`
-# Ansible module. See :ref:`cron__ref_jobs` for more details.
+# Ansible module. See :ref:`cron_ref_jobs` for more details.
 
 # YAML dictionary with a set of default :program:`cron` jobs to configure on
 # a host (currently none).
-cron__default_jobs: {}
+cron_default_jobs: {}
 
 # YAML dictionary with a set of :program:`cron` jobs defined by other Ansible
 # roles through the role dependent variables.
-cron__dependent_jobs: {}
+cron_dependent_jobs: {}
 
 # YAML dictionary with a set of :program:`cron` jobs defined for all hosts in
 # the Ansible inventory.
-cron__jobs: {}
+cron_jobs: {}
 
 # YAML dictionary with a set of :program:`cron` jobs defined for hosts in
 # a given Ansible inventory group.
-cron__group_jobs: {}
+cron_group_jobs: {}
 
 # YAML dictionary with a set of :program:`cron` jobs defined for specific hosts
 # in the Ansible inventory.
-cron__host_jobs: {}
+cron_host_jobs: {}
 
 # YAML dictionary which combines the :command:`cron` jobs defined in other
 # variables. This variable is used in the Ansible tasks.
-cron__combined_jobs: '{{ lookup("template",
-                         "lookup/cron__combined_jobs.j2",
+cron_combined_jobs: '{{ lookup("template",
+                         "lookup/cron_combined_jobs.j2",
                          convert_data=False) | from_yaml }}'
 
 

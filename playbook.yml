@@ -3,41 +3,71 @@
   # gather_facts: no
   # user: root
   # no_log: True
+  vars_prompt:
+    - name: run_common
+      prompt: 'Run the COMMON role? y/n'
+      default: 'n'
   roles:
   - role: common
     vars:
       - timezone: 'Europe/Kiev'
       - locale: 'en_US.UTF-8'
-      - create_user: 'deployer'
-      - common_packages: [ 'sudo', 'curl', 'vim', 'python3' ]
-      - install_recommends: no
+      - create_user: 'deployer'        # user for deploying by Ansible. Not implemented, just created
+      - common_packages: [ 'sudo', 'curl', 'vim', 'python3', 'net-tools', 'mc', 'locales' ]
+      - install_recommends: no         # do not install packages with recommends
+    when: run_common == 'Y' or run_common == 'y' or run_common == 'yes'
     tags: [ common ]
+
+  - role: cron
+    vars:
+      - install_recommends: no
+    tags: [ common, cron ]
+
+  - role: rsyslog
+    vars:
+      - install_recommends: no
+    tags: [ common, rsyslog ]
+
+  - role: logrotate
+    vars:
+      - install_recommends: no
+    tags: [ common, logrotate ]
+
+  - role: sshd
+    vars:
+      - install_recommends: no
+    tags: [ common, sshd, firewall ]
+
+  - role: ntp
+    vars:
+      - install_recommends: no
+    tags: [ common, ntp ]
+
+  - role: ufw
+    vars:
+      - install_recommends: no
+    tags: [ common, ufw, firewall ]
 
   - role: mysql
     vars:
       - mysql_install: true
-      - mysql_version: 10.0
-      - mysql_root_password: '123123123123'
+      - mysql_version: 10.0 # default 'latest'
+      - mysql_root_password: '123123123'
       - mysql_root_password_update: true
     tags: [ mysql ]
 
   - role: nginx
-    tags: [ www, nginx ]
-
-  - role: php
     vars:
-      php_version: '7.3'
-    tags: [ www, php ]
+      - nginx_install: true
+      - nginx_version: 1.14                # default 'latest'
+    tags: [ nginx, www ]
 
-  - role: phpmyadmin
-    tags: [ www, phpmyadmin ]
-
-  - role: redis
-    vars:
-      - git_install: true
-      - install_phpRedisAdmin: true
-      - install_recommends: no
-    tags: [ redis ]
+#  - role: redis
+#    vars:
+#      - git_install: true
+#      - install_phpRedisAdmin: true
+#      - install_recommends: no
+#    tags: [ redis ]
 
   - role: finish
     tags: [ finish ]
