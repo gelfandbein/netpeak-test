@@ -3,10 +3,11 @@
   # gather_facts: no
   # user: root
   # no_log: True
-  vars_prompt:
-    - name: run_common
-      prompt: 'Run the COMMON role? y/n'
-      default: 'n'
+  #vars_prompt:
+    #- name: run_common
+    #  prompt: 'Run the COMMON role? y/n'
+    #  default: 'n'
+    #  private: no
   roles:
   - role: common
     vars:
@@ -51,7 +52,7 @@
   - role: mysql
     vars:
       - mysql_install: true
-      - mysql_version: 10.0 # default 'latest'
+      - mysql_version: '10.0'                # default 'latest'
       - mysql_root_password: '123123123'
       - mysql_root_password_update: true
     tags: [ mysql ]
@@ -59,8 +60,20 @@
   - role: nginx
     vars:
       - nginx_install: true
-      - nginx_version: 1.14                # default 'latest'
+      - nginx_version: 1.14                  # default 'latest'
     tags: [ nginx, www ]
+
+  - role: php
+    vars:
+      - php_default_version_debian: '7.3'
+      - php_webserver_daemon: 'nginx'        # nginx OR apache2
+      - php_use_managed_ini: true
+      - php_install_recommends: true
+      - php_executable: 'php'
+      - php_packages_state: 'latest'         # present - not update packeges
+      - php_enable_php_fpm: true
+      - php_enable_apc: true
+    tags: [ php, www ]
 
 #  - role: redis
 #    vars:

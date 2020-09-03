@@ -1,17 +1,34 @@
 ---
-# Variable setup.
-- name: Include OS-specific variables.
-  include_vars: "{{ ansible_os_family }}.yml"
+- name: PHP | add OS specific variables
+  include_vars: '{{ loop_vars }}'
+  with_first_found:
+    - files:
+        - '{{ distribution }}-{{ distribution_version }}.yml'
+        - '{{ distribution }}-{{ distribution_major_version }}.yml'
+        - '{{ distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - '{{ ansible_system }}.yml'
+        - 'defaults.yml'
+      paths:
+        - 'vars'
+  loop_control:
+    loop_var: loop_vars
+  vars:
+    distribution: '{{ ansible_distribution }}'
+    distribution_version: '{{ ansible_distribution_version }}'
+    distribution_major_version: '{{ ansible_distribution_major_version }}'
+  tags: [ php, www ]
+
+
+- name: Set the default PHP version for Debian-based OSes.
+  set_fact:
+    php_default_version_debian: "{{ __php_default_version_debian }}"
+  when: ansible_os_family == 'Debian'
 
 - name: Define php_packages.
   set_fact:
     php_packages: "{{ __php_packages | list }}"
   when: php_packages is not defined
-
-- name: Define extra php_packages.
-  set_fact:
-    php_packages: "{{ php_packages | list + php_packages_extra | list }}"
-  when: php_packages_extra is defined
 
 - name: Define php_webserver_daemon.
   set_fact:
@@ -49,15 +66,9 @@
   when: php_fpm_conf_path is not defined
 
 # Setup/install tasks.
-- include_tasks: setup-RedHat.yml
+- include_tasks: '{{ ansible_os_family }}.yml'
   when:
     - not php_install_from_source
-    - ansible_os_family == 'RedHat'
-
-- include_tasks: setup-Debian.yml
-  when:
-    - not php_install_from_source
-    - ansible_os_family == 'Debian'
 
 # Install PHP from source when php_install_from_source is true.
 - include_tasks: install-from-source.yml

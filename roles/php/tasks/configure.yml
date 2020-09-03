@@ -18,3 +18,17 @@
   with_items: "{{ php_conf_paths }}"
   notify: restart webserver
   when: php_use_managed_ini
+
+# setting the php-fpm.conf .
+- name: Setting the php-fpm fastcgi server of nginx
+  become: true
+  template:
+    src: templates/nginx.default.j2
+    dest: /etc/nginx/sites-available/default
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart webserver
+
+
+
