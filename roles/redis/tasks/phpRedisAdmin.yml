@@ -1,5 +1,5 @@
 ---
-- name: Install git for pull phpRedisAdmin & Vendor
+- name: '--> install git for pull phpRedisAdmin & Vendor'
   apt:
     name: '{{ item }}'
     state: present
@@ -11,7 +11,7 @@
   when: install_git|bool
   tags: [ redis, www ]
 
-- name: Clone phpRedisAdmin to /usr/share/
+- name: '--> clone phpRedisAdmin to /usr/share/'
   git:
     repo: 'https://github.com/ErikDubbelboer/phpRedisAdmin.git'
     dest: /usr/share/phpredisadmin
@@ -20,7 +20,7 @@
   when: install_phpRedisAdmin|bool
   tags: [ redis, www ]
 
-- name: Clone Vendor to /usr/share/phpredisadmin/
+- name: '--> lone Vendor to /usr/share/phpredisadmin/'
   git:
     repo: 'https://github.com/nrk/predis.git'
     dest: /usr/share/phpredisadmin/vendor
@@ -29,7 +29,7 @@
   when: install_phpRedisAdmin|bool
   tags: [ redis, www ]
 
-- name: phpRedisAdmin link to web
+- name: '--> phpRedisAdmin link to web'
   file:
     src: /usr/share/phpredisadmin
     dest: /var/www/html/phpredisadmin

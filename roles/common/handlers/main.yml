@@ -3,7 +3,7 @@
   command: dpkg-reconfigure --frontend noninteractive tzdata
 
 
-- name: '--> restart ssh'
+- name: restart sshd
   become: "{{ sshd_become }}"
   become_user: "{{ sshd_become_user }}"
   service:

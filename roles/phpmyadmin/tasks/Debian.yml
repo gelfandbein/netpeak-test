@@ -11,7 +11,7 @@
     update_cache: yes
   tags: [ phpmyadmin, www ]
 
-- name: '--> installal dependencies'
+- name: '--> install dependencies'
   apt:
     name: '{{ item }}'
     state: latest
@@ -25,8 +25,8 @@
     - 'php{{ php_version }}-mysql'
     - 'php{{ php_version }}-xml'
     - 'php{{ php_version }}-zip'
-  tags: [ phpmyadmin, www ]
   when: install_phpMyAdmin|bool
+  tags: [ phpmyadmin, www ]
 
 - name: '--> ensure phpmyadmin package is installed'
   apt:
@@ -39,6 +39,7 @@
     path: /etc/nginx/conf.d
   changed_when: false
   register: nginx_conf_dir
+  tags: [ phpmyadmin, www ]
 
 #- name: '--> ensure phpmyadmin configuration for nginx is installed'
 #  template:
@@ -46,6 +47,7 @@
 #    dest: /etc/nginx/conf.d/phpmyadmin.conf
 #  notify: reload nginx
 #  when: nginx_conf_dir.stat.exists
+#  tags: [ phpmyadmin, www ]
 
 - name: '--> ensure phpmyadmin configuration is installed'
   template:
@@ -60,3 +62,7 @@
     owner: root
     group: root
     state: link
+  tags: [ phpmyadmin, www ]
+
+
+

@@ -87,6 +87,8 @@
       - php_version: '7.3'
       - install_phpMyAdmin: true
       - install_recommends: no
+      - phpmyadmin_server_user: root
+      - phpmyadmin_server_password: '{{ mysql_root_password }}'
     tags: [ phpmyadmin, www ]
 
   - role: finish
