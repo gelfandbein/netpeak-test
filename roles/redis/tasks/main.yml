@@ -1,29 +1,29 @@
 ---
-# Variable setup.
-- name: Include OS-specific variables.
-  include_vars: "{{ ansible_os_family }}.yml"
-
-- name: Define redis_package.
-  set_fact:
-    redis_package: "{{ __redis_package }}"
-  when: redis_package is not defined
+- name: REDIS | add OS specific variables
+  include_vars: '{{ loop_vars }}'
+  with_first_found:
+    - files:
+        - '{{ distribution }}-{{ distribution_version }}.yml'
+        - '{{ distribution }}-{{ distribution_major_version }}.yml'
+        - '{{ distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - '{{ ansible_system }}.yml'
+        - 'defaults.yml'
+      paths:
+        - 'vars'
+  loop_control:
+    loop_var: loop_vars
+  vars:
+    distribution: '{{ ansible_distribution }}'
+    distribution_version: '{{ ansible_distribution_version }}'
+    distribution_major_version: '{{ ansible_distribution_major_version }}'
+  tags: [ redis, www ]
 
 # Setup/install tasks.
-- include_tasks: setup-RedHat.yml
-  when: ansible_os_family == 'RedHat'
+- include_tasks: '{{ ansible_os_family }}.yml'
+  tags: [ redis, www ]
 
-- include_tasks: setup-Debian.yml
-  when: ansible_os_family == 'Debian'
+- include: phpRedisAdmin.yml
+  when: install_phpRedisAdmin|bool
+  tags: [ redis, www ]
 
-- include_tasks: setup-Archlinux.yml
-  when: ansible_os_family == 'Archlinux'
-
-- name: Ensure Redis is configured.
-  template:
-    src: redis.conf.j2
-    dest: "{{ redis_conf_path }}"
-    mode: 0644
-  notify: restart redis
-
-- name: Ensure Redis is running and enabled on boot.
-  service: "name={{ redis_daemon }} state=started enabled=yes"

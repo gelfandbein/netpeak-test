@@ -3,3 +3,14 @@
   command: dpkg-reconfigure --frontend noninteractive tzdata
 
 
+- name: '--> restart ssh'
+  become: "{{ sshd_become }}"
+  become_user: "{{ sshd_become_user }}"
+  service:
+    name: ssh
+    state: restarted
+  notify: wait for reconnect
+
+- name: 'wait for reconnect'
+  wait_for_connection:
+

@@ -1,11 +1,15 @@
 ---
 - name: Install git for pull phpRedisAdmin & Vendor
   apt:
-    name: git
+    name: '{{ item }}'
     state: present
     install_recommends: '{{ install_recommends }}'
-  when: git_install|bool
-  tags: [ redis, admin ]
+  with_items:
+    - git
+    - ca-certificates
+    - openssl
+  when: install_git|bool
+  tags: [ redis, www ]
 
 - name: Clone phpRedisAdmin to /usr/share/
   git:
@@ -14,7 +18,7 @@
     clone: yes
     update: yes
   when: install_phpRedisAdmin|bool
-  tags: [ redis, admin ]
+  tags: [ redis, www ]
 
 - name: Clone Vendor to /usr/share/phpredisadmin/
   git:
@@ -23,7 +27,7 @@
     clone: yes
     update: yes
   when: install_phpRedisAdmin|bool
-  tags: [ redis, admin ]
+  tags: [ redis, www ]
 
 - name: phpRedisAdmin link to web
   file:
@@ -31,5 +35,5 @@
     dest: /var/www/html/phpredisadmin
     state: link
   when: install_phpRedisAdmin|bool
-  tags: [ redis, admin ]
+  tags: [ redis, www ]
 

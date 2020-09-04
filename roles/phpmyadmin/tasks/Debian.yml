@@ -1,0 +1,62 @@
+---
+- name: '--> add pma-repo to apt-sources'
+  copy:
+    src: ../files/phpmyadmin.list
+    dest: /etc/apt/sources.list.d/phpmyadmin.list
+  when: install_phpMyAdmin|bool
+  tags: [ phpmyadmin, www ]
+
+- name: '--> update APT sources (add phpMyAdmin)'
+  apt:
+    update_cache: yes
+  tags: [ phpmyadmin, www ]
+
+- name: '--> installal dependencies'
+  apt:
+    name: '{{ item }}'
+    state: latest
+    update_cache: yes
+    install_recommends: '{{ install_recommends }}'
+  with_items:
+    - 'php{{ php_version }}-bz2'
+    - 'php{{ php_version }}-curl'
+    - 'php{{ php_version }}-gd'
+    - 'php{{ php_version }}-mbstring'
+    - 'php{{ php_version }}-mysql'
+    - 'php{{ php_version }}-xml'
+    - 'php{{ php_version }}-zip'
+  tags: [ phpmyadmin, www ]
+  when: install_phpMyAdmin|bool
+
+- name: '--> ensure phpmyadmin package is installed'
+  apt:
+    name: phpmyadmin
+    install_recommends: '{{ install_recommends }}'
+  tags: [ phpmyadmin, www ]
+
+- name: '--> check if nginx is installed'
+  stat:
+    path: /etc/nginx/conf.d
+  changed_when: false
+  register: nginx_conf_dir
+
+#- name: '--> ensure phpmyadmin configuration for nginx is installed'
+#  template:
+#    src: nginx.conf.j2
+#    dest: /etc/nginx/conf.d/phpmyadmin.conf
+#  notify: reload nginx
+#  when: nginx_conf_dir.stat.exists
+
+- name: '--> ensure phpmyadmin configuration is installed'
+  template:
+    src: config.php.j2
+    dest: /etc/phpmyadmin/conf.d/custom.php
+  tags: [ phpmyadmin, www ]
+
+- name: '--> create a symbolic link to web-interface'
+  file:
+    src: /usr/share/phpmyadmin
+    dest: /var/www/html/phpmyadmin
+    owner: root
+    group: root
+    state: link

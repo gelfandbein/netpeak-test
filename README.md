@@ -17,13 +17,13 @@ NetPeak Ansible test v0.69
 
 # FAQ
 
--> Copy yours 'id_rsa.pub' to current directory. This is for Ansible ssh authorized_keys.
--> Build image for tests: 'docker build . --tag netpeak:latest'
--> Run container: 'docker run -d -p 8181:80 --privileged netpeak:latest'
--> Run 'ansible-playbook playbook.yml' with next options:
-  -> Edit GLOBAL vars at ./playbook.yml
-  -> Edit defaults for TASKS at ./roles/*/tasks/defaults/main.yml
-  -> Any other vars by OS specific too: ./roles/*/tasks/vars/*.yml
+- Copy yours 'id_rsa.pub' to current directory. This is for Ansible ssh authorized_keys.
+- Build image for tests: 'docker build . --tag netpeak:latest'
+- Run container: 'docker run -d -p 8181:80 --privileged netpeak:latest'
+- Run 'ansible-playbook playbook.yml' with next options:
+  - Edit GLOBAL vars at ./playbook.yml
+  - Edit defaults for TASKS at ./roles/*/tasks/defaults/main.yml
+  - Any other vars by OS specific too: ./roles/*/tasks/vars/*.yml
 
 # Changes
 

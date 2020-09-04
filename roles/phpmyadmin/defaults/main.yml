@@ -1,4 +1,7 @@
 ---
+install_phpMyAdmin: true
+php_version: '7.3'
+
 phpmyadmin_php_fpm_socket: php-fpm
 
 phpmyadmin_server_host: localhost

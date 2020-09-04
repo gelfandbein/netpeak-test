@@ -1,6 +1,6 @@
 ---
 #
-git_install: true
+install_git: true
 install_phpRedisAdmin: true
 install_recommends: no
 

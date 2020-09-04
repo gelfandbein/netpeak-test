@@ -14,9 +14,9 @@
       - timezone: 'Europe/Kiev'
       - locale: 'en_US.UTF-8'
       - create_user: 'deployer'        # user for deploying by Ansible. Not implemented, just created
-      - common_packages: [ 'sudo', 'curl', 'vim', 'python3', 'net-tools', 'mc', 'locales' ]
+      - common_packages: [ 'sudo', 'curl', 'vim', 'python3', 'net-tools', 'mc', 'locales', 'ca-certificates', 'openssl' ]
       - install_recommends: no         # do not install packages with recommends
-    when: run_common == 'Y' or run_common == 'y' or run_common == 'yes'
+    # when: run_common == 'Y' or run_common == 'y' or run_common == 'yes'
     tags: [ common ]
 
   - role: cron
@@ -75,12 +75,19 @@
       - php_enable_apc: true
     tags: [ php, www ]
 
-#  - role: redis
-#    vars:
-#      - git_install: true
-#      - install_phpRedisAdmin: true
-#      - install_recommends: no
-#    tags: [ redis ]
+  - role: redis
+    vars:
+      - install_git: true
+      - install_phpRedisAdmin: true
+      - install_recommends: no
+    tags: [ redis, www ]
+
+  - role: phpmyadmin
+    vars:
+      - php_version: '7.3'
+      - install_phpMyAdmin: true
+      - install_recommends: no
+    tags: [ phpmyadmin, www ]
 
   - role: finish
     tags: [ finish ]
